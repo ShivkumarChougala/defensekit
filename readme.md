@@ -5,8 +5,7 @@
 
 ### 🧠 OVERVIEW
 
-Welcome to **DEFToolkit** — your black-ops digital weapon designed to dominate the cyber realm.  
-From encryption to phishing detection, this toolkit merges **power, simplicity, and chaos** into one Streamlit app.  
+Welcome to **DEFToolkit** — compact Streamlit app that brings essential cybersecurity tools together in one place. Use it to **generate strong passwords**, **create temporary emails**, **scan suspicious links**, **encrypt/decrypt files**, and **test password-protected PDFs** — all from an easy sidebar interface.
 
 Built for those who don’t just use the web — they **control** it.  
 
