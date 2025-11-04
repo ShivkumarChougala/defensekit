@@ -119,7 +119,7 @@ def home_page():
         st.markdown(
             """
             <ul class='hh-links'>
-                <li><a href='https://github.com/' target='_blank'>Project Repo</a></li>
+                <li><a href='https://github.com/ShivkumarChougala/defensekit/' target='_blank'>Project Repo</a></li>
                 <li><a href='https://www.owasp.org/' target='_blank'>OWASP Guides</a></li>
                 <li><a href='' target='_blank'>Learn More</a></li>
             </ul>
