@@ -1,0 +1,8 @@
+streamlit
+mailtm 
+beautifulsoup4
+cryptography
+streamlit-lottie
+pikepdf
+pyperclip
+tqdm

@@ -1,0 +1,178 @@
+/* ============================
+   Hacker Horror Theme - assets/style.css
+   ============================ */
+
+/* fonts (place these font files under assets/fonts/) */
+@font-face { font-family: 'VT323'; src: url('fonts/VT323-Regular.ttf'); }
+@font-face { font-family: 'Orbitron'; src: url('fonts/Orbitron-Regular.ttf'); }
+
+/* page & background */
+:root{
+  --bg-dark: #040506;
+  --glass: rgba(6,8,7,0.55);
+  --neon-green: #00ff9a;
+  --blood-red: #ff2e4a;
+  --muted: #9be7b8;
+}
+
+body {
+  background: url("images/hacker-bg.gif") center/cover no-repeat fixed, linear-gradient(180deg, rgba(0,0,0,0.6), rgba(8,8,8,0.9));
+  font-family: 'VT323', monospace;
+  color: var(--neon-green);
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 0 6px rgba(0,255,154,0.08);
+}
+
+/* veil to darken background (inserted by Home.py) */
+.bg-veil {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.62);
+  z-index: 0;
+}
+
+/* hide streamlit chrome */
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+header { visibility: hidden; }
+
+/* titles */
+.hh-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 40px;
+  color: var(--neon-green);
+  text-align: left;
+  margin-top: 6px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 18px rgba(0,255,154,0.28), 0 0 34px rgba(0,200,120,0.06);
+}
+.hh-sub {
+  color: #8fd6a8;
+  margin-top: -6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+/* separators */
+.sep { height: 2px; background: linear-gradient(90deg, rgba(0,255,154,0), rgba(0,255,154,0.22), rgba(0,255,154,0)); margin: 12px 0 18px 0; border-radius: 2px; box-shadow: 0 0 12px rgba(0,255,154,0.06);}
+.sep-small { height:1px; margin:8px 0; }
+
+/* terminal-like boxes */
+.hh-terminal {
+  background: linear-gradient(180deg, rgba(3,6,5,0.9), rgba(7,12,10,0.85));
+  border: 1px solid rgba(0,255,154,0.08);
+  padding: 14px;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  color: #c9ffdf;
+  margin-bottom: 12px;
+}
+.hh-terminal.small { padding:10px; font-size:14px; }
+
+.hh-term-header {
+  font-weight: 700;
+  color: var(--neon-green);
+  margin-bottom: 8px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.hh-term-body { line-height: 1.45; color: #bfeecd; font-size: 14px; }
+
+/* contact form */
+.hh-contact input[type="text"],
+.hh-contact input[type="email"],
+.hh-contact textarea {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,255,154,0.06);
+  color: var(--neon-green);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  resize: vertical;
+  font-family: 'VT323', monospace;
+}
+.hh-contact textarea { min-height: 90px; }
+.hh-contact button[type="submit"] {
+  background: linear-gradient(90deg, rgba(255,46,74,0.9), rgba(255,110,110,0.85));
+  color: #100606;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255,46,74,0.08);
+}
+.hh-contact button[type="submit"]:hover { filter: brightness(0.98); }
+
+/* right column */
+.right-panel { text-align: center; }
+.links-head { font-weight:700; margin-bottom:6px; color: var(--muted); }
+.hh-links { list-style: none; padding-left: 6px; color: var(--muted); }
+.hh-links li { margin: 8px 0; }
+.hh-links a { color: var(--neon-green); text-decoration: none; }
+.hh-links a:hover { color: var(--blood-red); text-decoration: underline; }
+
+/* ============================
+   ⚡ Hacker-Themed Footer Style
+   ============================ */
+.hh-footer {
+  margin-top: 40px;
+  padding: 20px 0;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+
+  color: #bff3b0; /* neon green text */
+  text-shadow: 0 0 6px rgba(191, 243, 176, 0.8),
+               0 0 12px rgba(0, 255, 100, 0.5);
+  opacity: 0.95;
+
+  border-top: 1px solid rgba(0, 255, 100, 0.12);
+  background: radial-gradient(circle at top, rgba(0, 255, 100, 0.05), transparent 80%);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Glow hover effect on footer links */
+.hh-footer a {
+  color: #ff5757;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 46, 74, 0.8);
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.hh-footer a:hover {
+  color: #00ff9a;
+  text-shadow: 0 0 12px rgba(0, 255, 154, 0.9),
+               0 0 18px rgba(0, 255, 154, 0.5);
+}
+
+/* Optional animation pulse for footer icons or email link */
+@keyframes glowPulse {
+  0% { text-shadow: 0 0 6px rgba(0,255,154,0.7); }
+  50% { text-shadow: 0 0 14px rgba(0,255,154,0.9); }
+  100% { text-shadow: 0 0 6px rgba(0,255,154,0.7); }
+}
+
+.hh-footer .pulse {
+  animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+/* subtle glitch flicker animation */
+@keyframes flicker {
+  0% { opacity: 1; transform: translateY(0); filter: drop-shadow(0 0 8px rgba(0,255,154,0.12)); }
+  5% { opacity: 0.86; transform: translateY(-1px); }
+  10% { opacity: 1; transform: translateY(0); }
+  20% { opacity: 0.9; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.hh-title, .hh-sub { animation: flicker 4s infinite; }
+
+/* responsive tweaks */
+@media (max-width: 760px) {
+  .hh-title { font-size: 28px; text-align:center; }
+  .hh-sub { text-align:center; }
+}
