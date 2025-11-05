@@ -6,7 +6,7 @@ import password
 import crypto
 import file
 import pdf
-
+import network
 
 # ----------------------------------------
 # Session State Class
@@ -14,7 +14,7 @@ import pdf
 class SessionState:
     """Manages the active navigation state for the Streamlit app."""
     def __init__(self):
-        self.current_page = "Dashboard"
+        self.current_page = "Home"
 
 
 # Initialize Session State
@@ -29,7 +29,8 @@ def main():
 
     # Sidebar Navigation Options (Professional Naming)
     page_options = [
-        "Dashboard",
+        "Home",
+        "Network scanner",
         "Temporary Email Service",
         "Secure Password Generator",
         "Phishing Link Analyzer",
@@ -47,11 +48,15 @@ def main():
     # ----------------------------------------
     # Page Routing
     # ----------------------------------------
-    if session_state.current_page == "Dashboard":
+    if session_state.current_page == "Home":
         dashboard.home_page()
 
+    elif session_state.current_page == "Network scanner":
+        network.network_page()
+        
     elif session_state.current_page == "Temporary Email Service":
         Email.email_page()
+
 
     elif session_state.current_page == "Secure Password Generator":
         password.passwordgen_page()

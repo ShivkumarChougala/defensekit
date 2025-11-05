@@ -13,10 +13,12 @@ Built for those who don’t just use the web — they **control** it.
 
 ## ⚙️ FEATURES ⚙️
 
+🌐  **Network Scanner** - network discovery and port scanner (TCP/UDP), service detection 
 💥 **Temporary Email Generator** — Mask your identity with disposable emails.  
 🔐 **Password Generator** — Forge uncrackable, customizable passwords.  
 🧱 **File Cryptography** — Encrypt/Decrypt files using powerful cryptographic algorithms.  
 🕵️ **Phishing Link Scanner** — Detect and dissect malicious URLs.  
+🚨 **AbuseIPDB Integration**  - Check and report malicious IPs using AbuseIPDB lookups to inform blocking
 📜 **PDF Decryptor** — Launch wordlist-based PDF attacks (for educational use only).  
 💣 **Custom Crypto Engine** — Encrypt, Decrypt, Experiment — like a cipher ninja.  
 🧭 **Streamlit Interface** — Navigate like a pro through a smooth
