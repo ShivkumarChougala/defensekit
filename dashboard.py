@@ -63,13 +63,14 @@ def home_page():
             <div class="hh-terminal small">
                 <div class="hh-term-header">▣ MODULES</div>
                 <div class="hh-term-body">
-                • Temporary Email Service<br/>
-                • Secure Password Generator<br/>
+                • Network Scanner e<br/>
                 • Phishing Link Analyzer<br/>
                 • Text Encryption & Decryption<br/>
                 • PDF Security Tools<br/>
-                • File Encryption Manager
-                </div>
+                • Temporary Email Service<br/>
+                • File Encryption Manager<br/>
+                • Secure Password Generator<br/>
+            
             </div>
             """,
             unsafe_allow_html=True,

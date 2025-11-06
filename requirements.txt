@@ -7,3 +7,5 @@ pikepdf
 pyperclip
 tqdm
 python-dotenv
+pyperclip 
+zxcvbn

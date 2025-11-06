@@ -1,111 +1,148 @@
 import streamlit as st
-from cryptography.fernet import Fernet, InvalidToken
-import base64
-
-
-def generate_key():
-    """
-    Generates a new encryption key.
-    """
-    return Fernet.generate_key()
-
-
-def validate_key(key_input):
-    """
-    Validates if the provided key is a valid 32-byte Base64-encoded string.
-    """
-    try:
-        # Decode the key and check its length
-        key = base64.urlsafe_b64decode(key_input)
-        if len(key) != 32:
-            raise ValueError("Invalid key length. The decoded key must be 32 bytes.")
-        return key_input.encode()  # Return the key as bytes
-    except Exception:
-        raise ValueError("Fernet key must be a valid 32-byte Base64-encoded string.")
-
-
-def encrypt_file(file_content, key):
-    """
-    Encrypts the file content using the provided key.
-    """
-    fernet = Fernet(key)
-    return fernet.encrypt(file_content)
-
-
-def decrypt_file(encrypted_content, key):
-    """
-    Decrypts the encrypted content using the provided key.
-    """
-    try:
-        fernet = Fernet(key)
-        return fernet.decrypt(encrypted_content)
-    except InvalidToken:
-        st.error("Invalid token: Unable to decrypt the file. Ensure the correct key is used.")
-        return None
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+import os
+import io
 
 
 def page():
-    st.title("File Encryptor & Decryptor")
-    st.markdown("This tool allows you to encrypt and decrypt files using the **Fernet** encryption method.")
+    """
+    AES-256 Secure File Encryptor & Decryptor
+    -----------------------------------------
+    Encrypt or decrypt any file using AES-256-GCM with password-based key derivation (PBKDF2-HMAC-SHA256).
+    This tool provides enterprise-grade encryption and a clean, professional UI.
+    """
 
-    # Upload the file
-    file_to_process = st.file_uploader("Upload a file to process")
+    # ============================================================
+    # 🔐 Utility Functions (defined inside page for full encapsulation)
+    # ============================================================
 
-    if file_to_process:
-        st.success("File uploaded successfully!")
-
-        # Operation selection
-        operation = st.radio("Select Operation", ["Encrypt", "Decrypt"])
-
-        # Key input
-        st.markdown("### Encryption Key")
-        key_input = st.text_input(
-            "Provide an encryption key (Base64 encoded). If empty during encryption, a new key will be generated:",
-            type="password",
+    def derive_key(password: str, salt: bytes) -> bytes:
+        """Derives a 256-bit AES key from the given password using PBKDF2 (SHA-256)."""
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,  # AES-256 key size
+            salt=salt,
+            iterations=390_000,
+            backend=default_backend()
         )
+        return kdf.derive(password.encode())
 
-        if st.button("Process File"):
-            try:
-                # Validate or generate key
-                key = None
-                if operation == "Decrypt":
-                    if not key_input:
-                        st.error("Decryption requires a valid encryption key!")
-                        return
-                    key = validate_key(key_input)
-                else:  # Encryption
-                    key = validate_key(key_input) if key_input else generate_key()
+    def encrypt_data(data: bytes, password: str) -> bytes:
+        """Encrypts binary data using AES-256-GCM."""
+        salt, iv = os.urandom(16), os.urandom(12)
+        key = derive_key(password, salt)
 
-                # Encrypt or decrypt based on the operation
-                file_content = file_to_process.read()
-                if operation == "Encrypt":
-                    encrypted_content = encrypt_file(file_content, key)
+        encryptor = Cipher(
+            algorithms.AES(key),
+            modes.GCM(iv),
+            backend=default_backend()
+        ).encryptor()
 
-                    # Display the encrypted content and download option
-                    st.subheader("Encryption Successful!")
-                    st.text("Your encryption key (save it to decrypt the file):")
-                    st.code(key.decode())
-                    st.download_button(
-                        label="Download Encrypted File",
-                        data=encrypted_content,
-                        file_name="encrypted_file.txt",
-                    )
+        ciphertext = encryptor.update(data) + encryptor.finalize()
+        return salt + iv + encryptor.tag + ciphertext
 
-                elif operation == "Decrypt":
-                    decrypted_content = decrypt_file(file_content, key)
-                    if decrypted_content:
-                        # Display the decrypted content and download option
-                        st.subheader("Decryption Successful!")
-                        st.download_button(
-                            label="Download Decrypted File",
-                            data=decrypted_content,
-                            file_name="decrypted_file.txt",
-                        )
+    def decrypt_data(encrypted_data: bytes, password: str) -> bytes:
+        """Decrypts AES-256-GCM encrypted data."""
+        try:
+            salt, iv, tag, ciphertext = (
+                encrypted_data[:16],
+                encrypted_data[16:28],
+                encrypted_data[28:44],
+                encrypted_data[44:]
+            )
 
-            except ValueError as e:
-                st.error(str(e))
+            key = derive_key(password, salt)
+            decryptor = Cipher(
+                algorithms.AES(key),
+                modes.GCM(iv, tag),
+                backend=default_backend()
+            ).decryptor()
+
+            return decryptor.update(ciphertext) + decryptor.finalize()
+
+        except Exception:
+            raise ValueError("Invalid password or corrupted file. Decryption failed.")
+
+    # ============================================================
+    # 🎨 Streamlit UI Layout
+    # ============================================================
+
+    st.title("🔐 AES-256 Secure File Encryptor & Decryptor")
+    st.caption("Professional-grade encryption powered by AES-256-GCM + PBKDF2-HMAC-SHA256")
+
+    uploaded_file = st.file_uploader("📁 Upload any file (image, PDF, ZIP, text, etc.)")
+
+    if not uploaded_file:
+        st.info("Please upload a file to continue.")
+        return
+
+    st.success(f"✅ File uploaded: **{uploaded_file.name}**")
+
+    operation = st.radio("Select Operation", ["Encrypt File", "Decrypt File"], horizontal=True)
+    password = st.text_input("Enter Password", type="password", placeholder="Enter a strong password")
+
+    col1, col2 = st.columns(2)
+    process_btn = col1.button("🚀 Start Processing", use_container_width=True)
+    clear_btn = col2.button("🧹 Clear", use_container_width=True)
+
+    if clear_btn:
+        st.rerun()
+
+    if process_btn:
+        if not password.strip():
+            st.error("⚠️ Please enter a password before continuing.")
+            return
+
+        data = uploaded_file.read()
+
+        try:
+            if operation == "Encrypt File":
+                with st.spinner("🔒 Encrypting..."):
+                    encrypted = encrypt_data(data, password)
+                    output_name = uploaded_file.name + ".enc"
+                st.success("✅ Encryption Successful!")
+                st.download_button(
+                    "📥 Download Encrypted File",
+                    data=encrypted,
+                    file_name=output_name,
+                    use_container_width=True
+                )
+
+            else:  # Decrypt
+                with st.spinner("🔓 Decrypting..."):
+                    decrypted = decrypt_data(data, password)
+                    output_name = uploaded_file.name.replace(".enc", "")
+                st.success("✅ Decryption Successful!")
+
+                # Preview if it's an image (warning-free)
+                if any(output_name.lower().endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]):
+                    st.image(io.BytesIO(decrypted), caption="🖼️ Decrypted Image Preview", use_container_width=True)
+
+                st.download_button(
+                    "📥 Download Decrypted File",
+                    data=decrypted,
+                    file_name=output_name,
+                    use_container_width=True
+                )
+
+        except ValueError as e:
+            st.error(f"❌ {str(e)}")
+        except Exception as e:
+            st.error(f"⚠️ Unexpected error: {str(e)}")
+
+    st.markdown("""
+    ---
+    **Encryption Standard:** AES-256-GCM  
+    **Key Derivation:** PBKDF2-HMAC-SHA256 (390k rounds)  
+    **Security:** Industry-grade | Tamper-proof | Binary-safe  
+    """)
 
 
-# Run the app
+# ============================================================
+# 🏁 Run this page directly (for debugging)
+# ============================================================
 if __name__ == "__main__":
     page()

@@ -31,12 +31,12 @@ def main():
     page_options = [
         "Home",
         "Network scanner",
-        "Temporary Email Service",
-        "Secure Password Generator",
         "Phishing Link Analyzer",
         "Text Encryption & Decryption",
         "PDF Security Tools",
-        "File Encryption Manager"
+        "Temporary Email Service",
+        "File Encryption Manager",
+        "Secure Password Generator"
     ]
 
     selected_page = st.sidebar.selectbox("📂 Select a Module", page_options)
@@ -53,13 +53,6 @@ def main():
 
     elif session_state.current_page == "Network scanner":
         network.network_page()
-        
-    elif session_state.current_page == "Temporary Email Service":
-        Email.email_page()
-
-
-    elif session_state.current_page == "Secure Password Generator":
-        password.passwordgen_page()
 
     elif session_state.current_page == "Phishing Link Analyzer":
         link.link_page()
@@ -73,6 +66,13 @@ def main():
 
     elif session_state.current_page == "File Encryption Manager":
         file.page()
+        
+    elif session_state.current_page == "Temporary Email Service":
+        Email.email_page()
+        
+     
+    elif session_state.current_page == "Secure Password Generator":
+        password.passwordgen_page()
 
 
 # ----------------------------------------

@@ -1,38 +1,78 @@
 import streamlit as st
-from mailtm import Email  # Assuming mailtm is a mock library for temporary email services
+from mailtm import Email
+import threading
+import time
+from queue import Queue
+
 
 def email_page():
-    def listener(new_message):
-        email_page.latest_message = new_message
-        st.experimental_rerun()  # Rerun the app to update the latest message display
+    st.title("📧 Temporary Email Service")
 
-    # Initialize the Email service
-    email_service = Email()
-    email_service.register()
-    
-    # Display the domain and the generated email address
-    st.write("Domain: " + email_service.domain)
-    st.write("Email Address: " + str(email_service.address))
-    
-    # Start listening for new emails
-    email_page.latest_message = None
-    email_service.start(listener)
-    
-    st.write("Waiting for new emails...")
+    # Initialize session state once
+    if "email_service" not in st.session_state:
+        email_service = Email()
+        email_service.register()
+        st.session_state.email_service = email_service
+        st.session_state.email_address = email_service.address
+        st.session_state.email_domain = email_service.domain
+        st.session_state.messages = []
+        st.session_state.new_message_queue = Queue()
 
-    # Create an input box with a copy button for the email address
-    st.text_input("Your temporary email address", email_service.address, key='email_display')
+        # Background listener (thread-safe)
+        def listener(new_msg):
+            st.session_state.new_message_queue.put(new_msg)
 
-    # Display the latest email message in a text area
-    if email_page.latest_message:
-        subject = email_page.latest_mesSsage['subject']
-        content = email_page.latest_message.get('text') or email_page.latest_message.get('html', '')
-        if isinstance(content, list):  # If content is a list, join it into a string
-            content = '\n'.join(content)
-        st.text_area("Latest Email Message", f"Subject: {subject}\nContent: {content}", height=300)
+        listener_thread = threading.Thread(
+            target=email_service.start, args=(listener,), daemon=True
+        )
+        listener_thread.start()
+
+    email_service = st.session_state.email_service
+
+    st.subheader("📮 Your Temporary Email Address")
+    st.text_input("Copy this email address to use anywhere:", st.session_state.email_address)
+    st.caption(f"🌐 Domain: {st.session_state.email_domain}")
+    st.caption("🔗 Login: https://mail.tm")
+
+    st.divider()
+
+    # Process new messages safely (from queue)
+    while not st.session_state.new_message_queue.empty():
+        msg = st.session_state.new_message_queue.get()
+        st.session_state.messages.insert(0, msg)
+
+    # Manual refresh option
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("🔄 Refresh Inbox"):
+            try:
+                msgs = email_service.get_mailbox()
+                st.session_state.messages = msgs
+            except Exception as e:
+                st.warning(f"⚠️ Unable to refresh inbox: {e}")
+
+    with col2:
+        auto_refresh = st.checkbox("Auto Refresh every 5s", value=True)
+
+    # Show messages
+    if st.session_state.messages:
+        st.success(f"📬 You have {len(st.session_state.messages)} message(s).")
+
+        for msg in st.session_state.messages:
+            subject = msg.get("subject", "No Subject")
+            content = msg.get("text") or msg.get("html") or ""
+            if isinstance(content, list):
+                content = "\n".join(content)
+            with st.expander(subject):
+                st.write(content)
     else:
-        st.text_area("Latest Email Message", "No new email messages yet.", height=100)       
+        st.info("No emails received yet. Wait a few seconds after registering somewhere.")
+
+    # Auto-refresh inbox
+    if auto_refresh:
+        time.sleep(5)
+        st.rerun()
+
 
 if __name__ == "__main__":
     email_page()
-
